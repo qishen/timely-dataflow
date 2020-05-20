@@ -15,8 +15,8 @@ repository = "https://github.com/TimelyDataflow/timely-dataflow.git"
 keywords = ["timely", "dataflow"]
 license = "MIT"
 
-[features]
-bincode= ["timely_communication/bincode"]
+# [features]
+# bincode= ["timely_communication/bincode"]
 
 [dependencies]
 serde = "1.0"

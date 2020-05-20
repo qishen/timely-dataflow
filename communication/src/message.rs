@@ -96,47 +96,47 @@ impl<T> Message<T> {
     }
 }
 
-// These methods require `T` to implement `Abomonation`, for serialization functionality.
-#[cfg(not(feature = "bincode"))]
-impl<T: Data> Message<T> {
-    /// Wrap bytes as a message.
-    ///
-    /// # Safety
-    ///
-    /// This method is unsafe, in that `Abomonated::new()` is unsafe: it presumes that
-    /// the binary data can be safely decoded, which is unsafe for e.g. UTF8 data and
-    /// enumerations (perhaps among many other types).
-    pub unsafe fn from_bytes(bytes: Bytes) -> Self {
-        let abomonated = abomonation::abomonated::Abomonated::new(bytes).expect("Abomonated::new() failed.");
-        Message { payload: MessageContents::Binary(abomonated) }
-    }
+// // These methods require `T` to implement `Abomonation`, for serialization functionality.
+// #[cfg(not(feature = "bincode"))]
+// impl<T: Data> Message<T> {
+//     /// Wrap bytes as a message.
+//     ///
+//     /// # Safety
+//     ///
+//     /// This method is unsafe, in that `Abomonated::new()` is unsafe: it presumes that
+//     /// the binary data can be safely decoded, which is unsafe for e.g. UTF8 data and
+//     /// enumerations (perhaps among many other types).
+//     pub unsafe fn from_bytes(bytes: Bytes) -> Self {
+//         let abomonated = abomonation::abomonated::Abomonated::new(bytes).expect("Abomonated::new() failed.");
+//         Message { payload: MessageContents::Binary(abomonated) }
+//     }
 
-    /// The number of bytes required to serialize the data.
-    pub fn length_in_bytes(&self) -> usize {
-        match &self.payload {
-            MessageContents::Binary(bytes) => { bytes.as_bytes().len() },
-            MessageContents::Owned(typed) => { abomonation::measure(typed) },
-            MessageContents::Arc(typed) =>{ abomonation::measure::<T>(&**typed) } ,
-        }
-    }
+//     /// The number of bytes required to serialize the data.
+//     pub fn length_in_bytes(&self) -> usize {
+//         match &self.payload {
+//             MessageContents::Binary(bytes) => { bytes.as_bytes().len() },
+//             MessageContents::Owned(typed) => { abomonation::measure(typed) },
+//             MessageContents::Arc(typed) =>{ abomonation::measure::<T>(&**typed) } ,
+//         }
+//     }
 
-    /// Writes the binary representation into `writer`.
-    pub fn into_bytes<W: ::std::io::Write>(&self, writer: &mut W) {
-        match &self.payload {
-            MessageContents::Binary(bytes) => {
-                writer.write_all(bytes.as_bytes()).expect("Message::into_bytes(): write_all failed.");
-            },
-            MessageContents::Owned(typed) => {
-                unsafe { abomonation::encode(typed, writer).expect("Message::into_bytes(): Abomonation::encode failed"); }
-            },
-            MessageContents::Arc(typed) => {
-                unsafe { abomonation::encode(&**typed, writer).expect("Message::into_bytes(): Abomonation::encode failed"); }
-            },
-        }
-    }
-}
+//     /// Writes the binary representation into `writer`.
+//     pub fn into_bytes<W: ::std::io::Write>(&self, writer: &mut W) {
+//         match &self.payload {
+//             MessageContents::Binary(bytes) => {
+//                 writer.write_all(bytes.as_bytes()).expect("Message::into_bytes(): write_all failed.");
+//             },
+//             MessageContents::Owned(typed) => {
+//                 unsafe { abomonation::encode(typed, writer).expect("Message::into_bytes(): Abomonation::encode failed"); }
+//             },
+//             MessageContents::Arc(typed) => {
+//                 unsafe { abomonation::encode(&**typed, writer).expect("Message::into_bytes(): Abomonation::encode failed"); }
+//             },
+//         }
+//     }
+// }
 
-#[cfg(feature = "bincode")]
+// #[cfg(feature = "bincode")]
 impl<T: Data> Message<T> {
     /// Wrap bytes as a message.
     pub fn from_bytes(bytes: Bytes) -> Self {
